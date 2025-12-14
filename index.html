@@ -13,10 +13,9 @@ body {
   color: #222;
   min-height: 100vh;
   background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
-  overflow-x: hidden;
 }
 
-/* ORNAMEN BACKGROUND */
+/* ORNAMEN */
 body::before,
 body::after {
   content: "";
@@ -27,42 +26,31 @@ body::after {
   border-radius: 50%;
   z-index: -1;
 }
-body::before {
-  top: -60px;
-  left: -60px;
-}
-body::after {
-  bottom: -80px;
-  right: -80px;
-}
-
-h1 { margin-top: 20px; }
+body::before { top: -60px; left: -60px; }
+body::after { bottom: -80px; right: -80px; }
 
 .container {
   max-width: 420px;
   margin: auto;
-  padding: 10px;
+  padding: 15px;
 }
 
 .card {
   width: 100%;
-  height: 280px;
+  height: 260px;
   background: white;
   border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  margin-top: 25px;
-  position: relative;
+  margin-top: 20px;
   perspective: 1000px;
   cursor: pointer;
 }
 
 .inner {
-  position: absolute;
   width: 100%;
   height: 100%;
   transition: transform 0.6s;
   transform-style: preserve-3d;
-  border-radius: 20px;
 }
 
 .card.flip .inner {
@@ -81,29 +69,19 @@ h1 { margin-top: 20px; }
   backface-visibility: hidden;
 }
 
-.front {
-  background: linear-gradient(135deg, #ffffff, #f7f7ff);
-}
-
+.front { background: #ffffff; }
 .back {
-  background: linear-gradient(135deg, #fff1c1, #ffd36e);
+  background: #ffe7a3;
   transform: rotateY(180deg);
 }
 
-.emoji {
-  font-size: 70px;
-  margin-bottom: 15px;
-}
-
+.emoji { font-size: 70px; }
 .jp {
   font-size: 2em;
-  margin: 0;
   font-weight: 600;
 }
 
-.nav {
-  margin: 15px 0;
-}
+.nav { margin: 15px 0; }
 
 button {
   background: #ff6f91;
@@ -114,28 +92,22 @@ button {
   font-size: 1em;
   cursor: pointer;
   margin: 5px;
-  transition: 0.2s;
-}
-
-button:hover {
-  background: #ff4f79;
 }
 
 .quiz {
   display: none;
+  background: white;
   margin-top: 20px;
-  background: rgba(255,255,255,0.9);
   padding: 15px;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
 input {
   padding: 10px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  border-radius: 10px;
   width: 80%;
-  font-size: 1em;
+  border: 2px solid #ddd;
 }
 </style>
 </head>
@@ -150,26 +122,29 @@ input {
     <button id="quizBtn">Kuis</button>
   </div>
 
+  <!-- FLASHCARD -->
   <div id="flashcard" class="card">
     <div class="inner">
       <div class="front">
-        <div class="emoji" id="emojiFront">👨‍👩‍👧‍👦</div>
-        <div class="jp" id="jp">かぞく</div>
+        <div class="emoji" id="emojiFront"></div>
+        <div class="jp" id="jp"></div>
       </div>
       <div class="back">
-        <div class="emoji" id="emojiBack">👨‍👩‍👧‍👦</div>
-        <div class="jp" id="idn">Keluarga</div>
+        <div class="emoji" id="emojiBack"></div>
+        <div class="jp" id="idn"></div>
       </div>
     </div>
   </div>
 
-  <div class="nav">
+  <!-- NAV -->
+  <div class="nav" id="nav">
     <button id="prevBtn">←</button>
     <span id="counter">1 / 17</span>
     <button id="nextBtn">→</button>
   </div>
 
-  <div class="quiz">
+  <!-- QUIZ -->
+  <div class="quiz" id="quiz">
     <p id="question"></p>
     <input id="answer" placeholder="Tulis dalam hiragana..." />
     <div><button id="checkBtn">Periksa</button></div>
@@ -201,47 +176,46 @@ const cards = [
 let current = 0;
 let quizIndex = 0;
 
-function showCard(i) {
-  const c = cards[i];
+function showCard() {
+  const c = cards[current];
   emojiFront.textContent = c.emoji;
   emojiBack.textContent = c.emoji;
   jp.textContent = c.jp;
   idn.textContent = c.idn;
-  counter.textContent = `${i+1} / ${cards.length}`;
+  counter.textContent = `${current + 1} / ${cards.length}`;
 }
 
-flashcard.onclick = () => {
-  flashcard.classList.toggle("flip");
-};
+flashcard.onclick = () => flashcard.classList.toggle("flip");
 
 nextBtn.onclick = () => {
   current = (current + 1) % cards.length;
   flashcard.classList.remove("flip");
-  showCard(current);
+  showCard();
 };
 
 prevBtn.onclick = () => {
   current = (current - 1 + cards.length) % cards.length;
   flashcard.classList.remove("flip");
-  showCard(current);
+  showCard();
 };
 
 quizBtn.onclick = () => {
   flashcard.style.display = "none";
-  document.querySelector(".nav").style.display = "none";
-  document.querySelector(".quiz").style.display = "block";
+  nav.style.display = "none";
+  quiz.style.display = "block";
   nextQuiz();
 };
 
 flashBtn.onclick = () => {
   flashcard.style.display = "block";
-  document.querySelector(".nav").style.display = "block";
-  document.querySelector(".quiz").style.display = "none";
+  nav.style.display = "block";
+  quiz.style.display = "none";
 };
 
 function nextQuiz() {
   quizIndex = Math.floor(Math.random() * cards.length);
-  question.textContent = `Bagaimana bahasa Jepang (hiragana) dari: ${cards[quizIndex].idn}?`;
+  question.textContent =
+    `Apa bahasa Jepang (hiragana) dari: ${cards[quizIndex].idn}?`;
   answer.value = "";
   result.textContent = "";
 }
@@ -255,116 +229,7 @@ checkBtn.onclick = () => {
   setTimeout(nextQuiz, 1500);
 };
 
-showCard(current);
-</script>
-</body>
-           </html>      </div>
-    </div>
-  </div>
-
-  <div class="nav">
-    <button id="prevBtn">←</button>
-    <span id="counter">1 / 17</span>
-    <button id="nextBtn">→</button>
-  </div>
-
-  <div class="quiz">
-    <p id="question"></p>
-    <input id="answer" placeholder="Tulis dalam hiragana..." />
-    <div><button id="checkBtn">Periksa</button></div>
-    <p id="result"></p>
-  </div>
-</div>
-
-<script>
-const cards = [
-  { emoji: "👨", jp: "おとうさん", idn: "Ayah" },
-  { emoji: "👩", jp: "おかあさん", idn: "Ibu" },
-  { emoji: "👦", jp: "おにいさん", idn: "Kakak laki-laki" },
-  { emoji: "👧", jp: "おねえさん", idn: "Kakak perempuan" },
-  { emoji: "👦🏻", jp: "おとうと", idn: "Adik laki-laki" },
-  { emoji: "👧🏻", jp: "いもうと", idn: "Adik perempuan" },
-  { emoji: "👶", jp: "むすこ", idn: "Anak laki-laki" },
-  { emoji: "👧🏼", jp: "むすめ", idn: "Anak perempuan" },
-  { emoji: "👴", jp: "そふ", idn: "Kakek" },
-  { emoji: "👵", jp: "そぼ", idn: "Nenek" },
-  { emoji: "👨‍🦱", jp: "おじさん", idn: "Paman" },
-  { emoji: "👩‍🦰", jp: "おばさん", idn: "Bibi" },
-  { emoji: "👩‍👧", jp: "ひとり", idn: "1 orang" },
-  { emoji: "👨‍👧‍👦", jp: "ふたり", idn: "2 orang" },
-  { emoji: "👨‍👩‍👧‍👦", jp: "さんにん", idn: "3 orang" },
-  { emoji: "🏠", jp: "よにん", idn: "4 orang" },
-  { emoji: "🏡", jp: "ごにん", idn: "5 orang" }
-];
-
-let current = 0;
-let quizIndex = 0;
-
-function showCard(i) {
-  const c = cards[i];
-  document.getElementById("emojiFront").textContent = c.emoji;
-  document.getElementById("emojiBack").textContent = c.emoji;
-  document.getElementById("jp").textContent = c.jp;
-  document.getElementById("idn").textContent = c.idn;
-  document.getElementById("counter").textContent = `${i+1} / ${cards.length}`;
-}
-
-function shuffle() {
-  for (let i = cards.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [cards[i], cards[j]] = [cards[j], cards[i]];
-  }
-  current = 0;
-  showCard(current);
-}
-
-document.getElementById("flashcard").addEventListener("click", () => {
-  document.getElementById("flashcard").classList.toggle("flip");
-});
-
-document.getElementById("nextBtn").onclick = () => {
-  current = (current + 1) % cards.length;
-  document.getElementById("flashcard").classList.remove("flip");
-  showCard(current);
-};
-document.getElementById("prevBtn").onclick = () => {
-  current = (current - 1 + cards.length) % cards.length;
-  document.getElementById("flashcard").classList.remove("flip");
-  showCard(current);
-};
-document.getElementById("shuffleBtn").onclick = shuffle;
-
-document.getElementById("quizBtn").onclick = () => {
-  document.getElementById("flashcard").style.display = "none";
-  document.querySelector(".nav").style.display = "none";
-  document.querySelector(".quiz").style.display = "block";
-  nextQuiz();
-};
-document.getElementById("flashBtn").onclick = () => {
-  document.getElementById("flashcard").style.display = "block";
-  document.querySelector(".nav").style.display = "block";
-  document.querySelector(".quiz").style.display = "none";
-};
-
-function nextQuiz() {
-  quizIndex = Math.floor(Math.random() * cards.length);
-  document.getElementById("question").textContent = `Bagaimana bahasa Jepang (hiragana) dari: ${cards[quizIndex].idn}?`;
-  document.getElementById("answer").value = "";
-  document.getElementById("result").textContent = "";
-}
-
-document.getElementById("checkBtn").onclick = () => {
-  const ans = document.getElementById("answer").value.trim();
-  const correct = cards[quizIndex].jp;
-  if (ans === correct) {
-    document.getElementById("result").textContent = "✅ Benar!";
-  } else {
-    document.getElementById("result").textContent = `❌ Salah. Jawaban: ${correct}`;
-  }
-  setTimeout(nextQuiz, 1500);
-};
-
-showCard(current);
+showCard();
 </script>
 </body>
 </html>
